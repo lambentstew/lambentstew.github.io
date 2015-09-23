@@ -1,0 +1,117 @@
+<ion-view title="{{action}}">
+  <ion-nav-bar class="bar-dark">
+    <ion-nav-back-button ng-click="programGoBack()">
+    </ion-nav-back-button>
+    <ion-nav-buttons side="right">
+      <button ng-hide="isNew" ng-click="delete()" class="button button-icon button-clear ion-trash-a header-item animZoomIn"></button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content>
+    <div id="program form" ng-hide="clickedCalendar">
+      <label class="item item-input">
+        <span class="input-label">Name</span>
+        <input type="text" ng-model="program.name">
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Tags</span>
+        <input type="text" ng-model="program.tags">
+      </label>
+    </div>
+    <div ng-hide="isNew" class="calendar stable-bg animZoomIn">
+      <div class="row">
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">&nbsp;</div>
+        <div class="col heading">S</div>
+        <div class="col heading">M</div>
+        <div class="col heading">T</div>
+        <div class="col heading">W</div>
+        <div class="col heading">T</div>
+        <div class="col heading">F</div>
+        <div class="col heading">S</div>
+      </div>
+      <div ng-show="weeks[$index]" ng-repeat="w in range(weeks.length) track by $index" class="row calendarRow animSlideInLeft">
+        <div class="col heading" style="padding-top:0px; padding-bottom:10px;">
+          {{$index+1}}
+        </div>
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">
+          <button class="button button-small button-fab button-stable" ng-click="clickCalendar($index, 0)"><i class="icon ion-plus"></i></button>
+        </div>
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">
+          <button class="button button-small button-fab button-stable" ng-click="clickCalendar($index, 1)"><i class="icon ion-plus"></i></button>
+        </div>
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">
+          <button class="button button-small button-fab button-stable" ng-click="clickCalendar($index, 2)"><i class="icon ion-plus"></i></button>
+        </div>
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">
+          <button class="button button-small button-fab button-stable" ng-click="clickCalendar($index, 3)"><i class="icon ion-plus"></i></button>
+        </div>
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">
+          <button class="button button-small button-fab button-stable" ng-click="clickCalendar($index, 4)"><i class="icon ion-plus"></i></button>
+        </div>
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">
+          <button class="button button-small button-fab button-stable" ng-click="clickCalendar($index, 5)"><i class="icon ion-plus"></i></button>
+        </div>
+        <div class="col" style="padding-top:0px; padding-bottom:10px;">
+          <button class="button button-small button-fab button-stable" ng-click="clickCalendar($index, 6)"><i class="icon ion-plus"></i></button>
+        </div>
+      </div>
+    </div>
+    <div ng-hide="clickedCalendar" class="padding">
+      <button ng-click="save()" class="button button-block button-positive activated">Save</button>
+    </div>
+    <div ng-show="clickedCalendar">
+      <div class="bar bar-dark bar-subheader static text-center">
+        <strong class="title">Week {{ week+1 }}, Day {{ day+1 }}</strong>
+      </div>
+      <div ng-repeat="w in workouts">
+        <div class="bar bar-subheader bar-stable static text-center">
+          <strong class="title">{{w.name}}</strong>
+        </div>
+        <div class="list set-list">
+          <div class="item" ng-repeat="s in w.sets track by $index">
+            <h2 ng-class="{'border-top': $index!=0}">{{ s.name }}</h2>
+            <div class="set-attributes">
+              <div class="item item-input" ng-repeat="a in s.attributes">
+                <span class="input-label">{{ a[0] }}</span>
+                <div class="set-attribute">
+                  <input type="number" ng-model="a[1]" size="4" />
+                </div>
+                <div style="margin-left:3px;margin-right:25px;">
+                  <button class="button button-small button-stable number-button" ng-click="a[1]=a[1]+1"><i class="icon ion-chevron-up"></i></button>
+                  <button class="button button-small button-stable number-button" ng-click="a[1]>0?a[1]=a[1]-1:0"><i class="icon ion-chevron-down"></i></button>
+                </div>
+                <div class="set-attribute">
+                  <input type="number" ng-model="a[2]" size="4" />
+                </div>
+                <div style="margin-left:3px;margin-right:25px;">
+                  <button class="button button-small button-stable number-button" ng-click="a[2]=a[2]+1"><i class="icon ion-chevron-up"></i></button>
+                  <button class="button button-small button-stable number-button" ng-click="a[2]>0?a[2]=a[2]-1:0"><i class="icon ion-chevron-down"></i></button>
+                </div>
+              </div>
+              
+            </div>
+          </div>          
+          <div class="item">
+            <label class="item item-input">
+              <input type="search" placeholder="Search Exercises" ng-model="newset.name" ng-change="onSearchExercise()" />
+            </label>
+            <div class="list card stable-bg" ng-show="newset.name.length > 2 && searchResults.length == 0">
+              <div class="item item-body">
+                No results found, check your spelling or <a href="#">create a new exercise</a>
+              </div>
+            </div>
+            <div class="list list-inset" ng-show="searchResults.length > 0">
+              <div class="item" ng-repeat="r in searchResults">
+                {{ r.name }}
+              </div>
+            </div>
+          </div>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
