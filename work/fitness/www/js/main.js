@@ -127,6 +127,23 @@ angular.module('starter.analytics', ['ionic'])
 
 .controller('Analytics', [function() {
 }]);
+angular.module('starter.home', ['ionic'])
+
+.config(['$stateProvider', function($stateProvider) {
+  $stateProvider
+    .state('home', {
+      url: '/home',
+      views: {
+        home: {
+          templateUrl: 'templates/home/home.html',
+          controller: 'Home'
+        }
+      }
+    });
+}])
+
+.controller('Home', [function() {
+}]);
 angular.module('starter.exercises-service', [])
         
 .factory('ExercisesService', ['$q', function($q) {
@@ -142,6 +159,7 @@ angular.module('starter.exercises-service', [])
   ]
 
   return {
+    loadInitialExercises: loadInitialExercises,
     initDB: initDB,
     index: index,
     show: show,
@@ -151,7 +169,7 @@ angular.module('starter.exercises-service', [])
     search: search
   };
 
-  function initDB() {
+  function loadInitialExercises() {
     PouchDB.allDbs().then(function (dbs) {
       if(dbs.length == 0) {
         _db = new PouchDB('fitness');
@@ -164,6 +182,9 @@ angular.module('starter.exercises-service', [])
       }
     }).catch(function (err) {
     });
+  };
+
+  function initDB() {
     _db = new PouchDB('fitness');
     window.PouchDB = PouchDB;
   };
@@ -294,38 +315,30 @@ function($scope, $ionicPlatform, ExercisesService) {
 	});  
 }]);
 
-angular.module('starter.home', ['ionic'])
+angular.module('starter.splash', ['ionic'])
 
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider
-    .state('home', {
-      url: '/home',
+    .state('splash', {
+      url: '/splash',
       views: {
         home: {
-          templateUrl: 'templates/home/home.html',
-          controller: 'Home'
-        }
-      }
-    })
-    .state('home.left', {
-      url: '/left',
-      views: {
-        leftright: {
-          templateUrl: 'templates/home/left.html'
-        }
-      }
-    })
-    .state('home.right', {
-      url: '/right',
-      views: {
-        leftright: {
-          templateUrl: 'templates/home/right.html'
+          templateUrl: 'templates/splash/splash.html',
+          controller: 'Splash'
         }
       }
     });
 }])
 
-.controller('Home', [function() {
+.controller('Splash', ['$scope', '$state', '$timeout', '$ionicPlatform', 'ExercisesService',
+function($scope, $state, $timeout, $ionicPlatform, ExercisesService) {
+  // Initialize the database.
+	$ionicPlatform.ready(function() {
+		ExercisesService.loadInitialExercises();
+    $timeout(function() {
+      $state.transitionTo('home');
+    }, 2500);
+	});  
 }]);
 angular.module('starter.programs-service', [])
         
@@ -582,17 +595,6 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicPlatform, $ionicHistor
   ];
   $scope.newset = { name: '' };
   $scope.searchResults = [];
-  
-  $scope.inc = function(val) {
-    console.log(val);
-    val = val + 1;
-    console.log(val);
-  };
-  $scope.dec = function(val) {
-    if(val >= 0) {
-      val = val - 1;
-    }
-  };
   
   $scope.onSearchExercise = function() {
     console.log("fired onSearchExercise()");
