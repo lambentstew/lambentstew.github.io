@@ -30,21 +30,33 @@
       font-size: 9px;
       line-height: 9px; }
 
-.set-list h2 {
-  padding-top: 10px; }
-.set-list .set-attributes {
+.workout-card .bar:hover {
+  background: #11c1f3; }
+.workout-card .set-list h2 {
+  padding-top: 16px;
+  padding-bottom: 16px; }
+  .workout-card .set-list h2 button {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    padding: 0px;
+    min-height: 0px;
+    min-width: 0px; }
+.workout-card .set-list .item {
+  padding-top: 0px; }
+.workout-card .set-list .set-attributes {
   display: inline-block; }
-  .set-list .set-attributes .input-label {
+  .workout-card .set-list .set-attributes .input-label {
     display: inline-block; }
-  .set-list .set-attributes .set-attribute {
+  .workout-card .set-list .set-attributes .set-attribute {
     display: flex; }
-    .set-list .set-attributes .set-attribute input[type="number"] {
+    .workout-card .set-list .set-attributes .set-attribute input[type="number"] {
       text-align: center;
       padding: 0px;
       display: inline-block;
       -moz-appearance: textfield;
       border-bottom: 1px solid #ccc; }
-      .set-list .set-attributes .set-attribute input[type="number"]::-webkit-outer-spin-button, .set-list .set-attributes .set-attribute input[type="number"]::-webkit-inner-spin-button {
+      .workout-card .set-list .set-attributes .set-attribute input[type="number"]::-webkit-outer-spin-button, .workout-card .set-list .set-attributes .set-attribute input[type="number"]::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0; }
 

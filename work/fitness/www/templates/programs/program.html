@@ -3,6 +3,7 @@
     <ion-nav-back-button ng-click="programGoBack()">
     </ion-nav-back-button>
     <ion-nav-buttons side="right">
+      <button ng-show="clickedCalendar" ng-click="addWorkout()" class="button button-clear" style="white-space:normal;width:inherit;max-width:inherit;"><i class="ion-android-add"></i> Workout</button>
       <button ng-hide="isNew" ng-click="delete()" class="button button-clear animZoomIn"><i class="icon ion-trash-a"></i></button>
     </ion-nav-buttons>
   </ion-nav-bar>
@@ -46,10 +47,15 @@
       <button ng-click="save()" class="button button-small button-positive"><i class="icon ion-android-done"></i> Save</button>
     </div>
     <div ng-show="clickedCalendar">
-      <div ng-repeat="w in workouts">
-        <div class="bar bar-subheader bar-stable static text-center">
-          <strong class="title">{{w.name}}</strong>
-          <button ng-click="addWorkout()" class="button button-fab button-balanced"><i class="icon ion-android-add"></i></button>
+      <div class="card workout-card" ng-repeat="w in workouts">
+        <div class="bar bar-subheader bar-calm static text-center" style="border:0;">
+          <div class="title title-left">{{w.name}}</div>
+          <div class="buttons buttons-right header-item">
+            <span class="right-buttons">
+              <button ng-click="openNewSetModal(w)" class="button button-clear" style="white-space:normal;width:inherit;max-width:inherit;"><i class="ion-android-add"></i> Set</button>
+              <button ng-click="deleteWorkout()" class="button button-clear"><i class="icon ion-trash-a"></i></button>
+            </span>
+          </div>
         </div>
         <div class="list set-list">
           <div class="item" ng-repeat="s in w.sets track by $index">
@@ -73,9 +79,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="padding">
-            <button ng-click="openNewSetModal(w)" class="button button-small button-balanced"><i class="icon ion-android-add"></i> Add Set</button>
           </div>
         </div>
       </div>

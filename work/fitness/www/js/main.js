@@ -377,6 +377,23 @@ function($scope, $stateParams, $ionicPlatform, $ionicHistory, ExercisesService) 
   }
 }]);
 
+angular.module('starter.home', ['ionic'])
+
+.config(['$stateProvider', function($stateProvider) {
+  $stateProvider
+    .state('home', {
+      url: '/home',
+      views: {
+        home: {
+          templateUrl: 'templates/home/home.html',
+          controller: 'Home'
+        }
+      }
+    });
+}])
+
+.controller('Home', [function() {
+}]);
 angular.module('starter.programs-service', [])
         
 .factory('ProgramsService', ['$q', function($q) {
@@ -691,15 +708,21 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
   $scope.deleteSet = function(w, i) {
     w.sets.splice(i, 1);
     if(w.sets.length == 0) {
-      if($scope.workouts.length == 1) {
-        WorkoutsService.destroy(w);
-        $scope.program.calendarSummary[$scope.week].days[$scope.day] = 0;
+      WorkoutsService.destroy(w);
+      WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_').then(function(workouts) {
+        $scope.workouts = workouts;
+        $scope.program.calendarSummary[$scope.week].days[$scope.day] = $scope.workouts.length;
         $scope.save();
-      }
+      });
+      $scope.save();
     } else {
       $scope.saveWorkout(w);
     }
   };
+  
+  $scope.addWorkout = function() {
+    $scope.workouts.push({name: 'Workout '+($scope.workouts.length+1), sets: []});
+  }
   
   $scope.saveWorkout = function(w) {
     if (!w._id) {
@@ -733,23 +756,6 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     // if something goes wrong make sure its got a unique stateId
     return ionic.Utils.nextUid();
   };
-}]);
-angular.module('starter.home', ['ionic'])
-
-.config(['$stateProvider', function($stateProvider) {
-  $stateProvider
-    .state('home', {
-      url: '/home',
-      views: {
-        home: {
-          templateUrl: 'templates/home/home.html',
-          controller: 'Home'
-        }
-      }
-    });
-}])
-
-.controller('Home', [function() {
 }]);
 angular.module('starter.splash', ['ionic'])
 
