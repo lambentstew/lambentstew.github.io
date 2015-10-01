@@ -3,13 +3,15 @@
   .calendar .row .col {
     padding-top: 15px;
     padding-bottom: 15px;
-    text-align: center; }
+    text-align: center;
+    position: relative; }
     .calendar .row .col button {
       height: 30px;
       width: 30px; }
   .calendar .row .heading {
-    font-size: 75%;
-    opacity: .75; }
+    font-size: 85%;
+    opacity: .75;
+    color: #000; }
 .calendar .title {
   font-size: 16px; }
 

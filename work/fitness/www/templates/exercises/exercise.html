@@ -1,0 +1,34 @@
+<ion-view title="{{action}}">
+  <ion-nav-bar class="bar-dark">
+    <ion-nav-back-button>
+    </ion-nav-back-button>
+    <ion-nav-buttons side="right">
+      <button ng-hide="isNew" ng-click="delete()" class="button button-clear animZoomIn"><i class="icon ion-trash-a"></i></button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content>
+    <div id="program form" ng-hide="clickedCalendar">
+      <label class="item item-input">
+        <span class="input-label">Name</span>
+        <input type="text" ng-model="exercise.name">
+      </label>
+    </div>
+    <div class="list">
+      <div class="item">
+        <h2>Exercise Attributes</h2>
+      </div>
+      <div class="item item-toggle" ng-repeat="a in attributeList">
+        <label class="toggle toggle-assertive">
+          <input type="checkbox" ng-model="a[2]" ng-change="onChangeAttribute()">
+          <div class="track">
+            <div class="handle"></div>
+          </div>
+        </label>
+        {{a[1]}} ({{a[0]}})
+      </div>
+    </div>
+    <div class="padding">
+      <button ng-click="save()" class="button button-small button-positive"><i class="icon ion-android-done"></i> Save</button>
+    </div>
+  </ion-content>
+</ion-view>

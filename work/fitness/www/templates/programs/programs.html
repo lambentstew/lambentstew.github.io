@@ -1,12 +1,12 @@
 <ion-view title="Listing Programs">
   <ion-nav-bar class="bar-dark">
     <ion-nav-buttons side="right">
-      <button ui-sref="programs.program({isNew: true, action: 'Add Program', program: {}, week: -1, day: -1, clickedCalendar: false, calendarClickCounter: 0})" class="button button-icon button-clear ion-android-add"></button>
+      <button ui-sref="programs.program({isNew: true, action: 'Add Program', program_id: '', week: -1, day: -1, clickedCalendar: false, calendarClickCounter: 0})" class="button button-fab button-balanced"><i class="icon ion-android-add"></i></button>
     </ion-nav-buttons>
   </ion-nav-bar>
   <ion-content padding="true">
      <ion-list>
-      <ion-item ng-repeat="p in programs" ui-sref="programs.program({isNew: false, action: 'Editing '+p.name, program: p, week: -1, day: -1, clickedCalendar: false, calendarClickCounter: 0})">
+      <ion-item ng-repeat="p in programs" ui-sref="programs.program({isNew: false, action: 'Editing '+p.name, program_id: p._id, week: -1, day: -1, clickedCalendar: false, calendarClickCounter: 0})">
         <div style="float: left"><strong>{{ p.name }}</strong></div>
         <div style="float: right">{{ p.tags }}</div>
       </ion-item>

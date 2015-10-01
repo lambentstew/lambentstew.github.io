@@ -8,6 +8,7 @@ angular.module('starter', [
     'ionic-material',
     'starter.exercises-service',
     'starter.programs-service',
+    'starter.workouts-service',
     'starter.splash',
     'starter.home',
     'starter.exercises',

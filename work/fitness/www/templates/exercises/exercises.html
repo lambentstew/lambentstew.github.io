@@ -1,14 +1,14 @@
 <ion-view title="Listing Exercises">
   <ion-nav-bar class="bar-dark">
     <ion-nav-buttons side="right">
-      <button class="button button-icon button-clear ion-android-add"></button>
+      <button ui-sref="exercises.exercise({isNew: true, action: 'Add Exercise', exercise: {name: '', attributes: []}})" class="button button-fab button-balanced"><i class="icon ion-android-add"></i></button>
     </ion-nav-buttons>
   </ion-nav-bar>
   <ion-content padding="true">
      <ion-list>
-      <ion-item ng-repeat="e in exercises">
+      <ion-item ng-repeat="e in exercises" ui-sref="exercises.exercise({isNew: false, action: 'Editing '+e.name, exercise: e})">
         <div style="float: left"><strong>{{ e.name }}</strong></div>
-        <div style="float: right" ng-repeat="a in e.attributes">{{ a }}&nbsp;</div>
+        <div style="float: right" ng-repeat="a in e.attributes">{{ a[0] }}&nbsp;</div>
       </ion-item>
     </ion-list>
   </ion-content>
