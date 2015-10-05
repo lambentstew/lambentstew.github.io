@@ -563,51 +563,53 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     }
   };
   
-  // Initialize the database.
-	$ionicPlatform.ready(function() {
-		ProgramsService.initDB();
-    ExercisesService.initDB();
-    if($scope.isNew) {
-      $scope.program = {calendarSummary: [{display: true, days:[0,0,0,0,0,0,0]},{display: true, days:[0,0,0,0,0,0,0]},{display: true, days:[0,0,0,0,0,0,0]}]};
-    } else {
-      ProgramsService.show($scope.program_id).then(function(doc) {
-        $scope.program = doc;
-        if($scope.clickedCalendar) {
-          for(var i=0; i<$scope.program.calendarSummary.length; i++) {
-            if(i != $scope.week) {
-              $scope.program.calendarSummary[i].display = false;
-            }
-          }
-          WorkoutsService.initDB();
-          // Get all program records from the database.
-          WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_').then(function(workouts) {
-            $scope.workouts = workouts;
-            if($scope.workouts.length == 0) {
-              $scope.workouts = [
-                {
-                  name: 'Workout 1',
-                  sets: []
-                }
-              ];
-            }
-          });
-        }
-        if($scope.week > -1) {
-          $scope.title = "Week "+$scope.week+", Day "+$scope.day;
-        } else {
-          $scope.title = $scope.action+" Program";
-          if($scope.program.calendarSummary) {
+  $scope.$on('$ionicView.afterEnter', function() {
+    // Initialize the database.
+    $ionicPlatform.ready(function() {
+      ProgramsService.initDB();
+      ExercisesService.initDB();
+      if($scope.isNew) {
+        $scope.program = {calendarSummary: [{display: true, days:[0,0,0,0,0,0,0]},{display: true, days:[0,0,0,0,0,0,0]},{display: true, days:[0,0,0,0,0,0,0]}]};
+      } else {
+        ProgramsService.show($scope.program_id).then(function(doc) {
+          $scope.program = doc;
+          if($scope.clickedCalendar) {
             for(var i=0; i<$scope.program.calendarSummary.length; i++) {
-              $scope.program.calendarSummary[i].display = true;
+              if(i != $scope.week) {
+                $scope.program.calendarSummary[i].display = false;
+              }
+            }
+            WorkoutsService.initDB();
+            // Get all program records from the database.
+            WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_').then(function(workouts) {
+              $scope.workouts = workouts;
+              if($scope.workouts.length == 0) {
+                $scope.workouts = [
+                  {
+                    name: 'Workout 1',
+                    sets: []
+                  }
+                ];
+              }
+            });
+          }
+          if($scope.week > -1) {
+            $scope.title = "Week "+$scope.week+", Day "+$scope.day;
+          } else {
+            $scope.title = $scope.action+" Program";
+            if($scope.program.calendarSummary) {
+              for(var i=0; i<$scope.program.calendarSummary.length; i++) {
+                $scope.program.calendarSummary[i].display = true;
+              }
             }
           }
-        }
 
-        $scope.newset = { name: '' };
-        $scope.searchResults = [];
-      });
-    }
-	});
+          $scope.newset = { name: '' };
+          $scope.searchResults = [];
+        });
+      }
+    });
+  });
   
   $ionicModal.fromTemplateUrl('new-set-modal.html', {
     scope: $scope,

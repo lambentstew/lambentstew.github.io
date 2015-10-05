@@ -29,7 +29,7 @@
         <div class="col heading">F</div>
         <div class="col heading">S</div>
       </div>
-      <div ng-show="program.calendarSummary[$index].display" ng-repeat="w in program.calendarSummary track by $index" ng-init="weekIndex = $index" class="row calendarRow animSlideInLeft">
+      <div ng-show="program.calendarSummary[$index].display" ng-class="{'calendarRow-anim' : program.calendarSummary[$index].display}" ng-repeat="w in program.calendarSummary track by $index" ng-init="weekIndex = $index" class="row calendarRow">
         <div class="col heading" style="padding-top:0px; padding-bottom:10px;">
           {{$index+1}}
         </div>
@@ -47,7 +47,7 @@
       <button ng-click="save()" class="button button-small button-positive"><i class="icon ion-android-done"></i> Save</button>
     </div>
     <div ng-show="clickedCalendar">
-      <div class="card workout-card" ng-repeat="w in workouts">
+      <div class="card workout-card animZoomIn" ng-repeat="w in workouts">
         <div class="bar bar-subheader bar-calm static text-center" style="border:0;">
           <div class="title title-left">{{w.name}}</div>
           <div class="buttons buttons-right header-item">
