@@ -2,7 +2,36 @@
   <ion-nav-bar class="bar-dark">
   </ion-nav-bar>
   <ion-content padding="true">
-    <h2>Home Page</h2>
-    <p>Here's the main route for the app.</p>
+    <center><img src="./img/profile_pic.png" alt="Profile Picture" style="border-radius:50%;height:50px;"/></center>
+    <center><h2><img src="./img/profile_flag.png" alt="Profile Picture" style="height:20px;"/> {{ prefs.name }}</h2></center>
+    <center><p>"{{ prefs.quote }}"</p></center>
+    
+    <div class="card set-card list set-list">
+      <div class="bar bar-dark mini-bar static text-center" style="border:0;">
+        <div class="title title-left">Weight Unit</div>
+      </div>
+      <div>
+        <ion-radio ng-model="prefs.wt.unit" ng-value="'kg'">Kilogram (kg)</ion-radio>
+        <ion-radio ng-model="prefs.wt.unit" ng-value="'lb'">Pound (lb)</ion-radio>
+      </div>
+    </div>
+    
+    <div class="card set-card list set-list">
+      <div class="bar bar-dark mini-bar static text-center" style="border:0;">
+        <div class="title title-left">Weight Increment</div>
+      </div>
+      <div class="set-attributes">
+        <div class="item item-input">
+          <div class="set-attribute">
+            <input type="number" ng-model="prefs.wt.inc" ng-blur="" size="4" />
+          </div>
+          <div style="margin-left:3px;margin-right:25px;">
+            <button class="button button-small button-clear button-stable number-button" ng-click="prefs.wt.inc=prefs.wt.inc+1"><i class="icon ion-chevron-up"></i></button>
+            <button class="button button-small button-clear button-stable number-button" ng-click="prefs.wt.inc>0?prefs.wt.inc=prefs.wt.inc-1:0"><i class="icon ion-chevron-down"></i></button>
+          </div>
+          {{ prefs.wt.unit }}
+        </div>
+      </div>
+    </div>
   </ion-content>
 </ion-view>

@@ -32,52 +32,63 @@
 
 .workout-card .bar:hover {
   background: #11c1f3; }
-.workout-card .set-list h2 {
-  padding-top: 16px;
-  padding-bottom: 16px; }
-  .workout-card .set-list h2 button {
-    position: absolute;
-    top: 0px;
-    right: 10px;
-    padding: 0px;
-    min-height: 0px;
-    min-width: 0px; }
-.workout-card .set-list .item {
-  padding-top: 0px; }
-.workout-card .set-list .set-attributes {
-  display: inline-block; }
-  .workout-card .set-list .set-attributes .input-label {
-    display: inline-block; }
-  .workout-card .set-list .set-attributes .set-attribute {
-    display: flex; }
-    .workout-card .set-list .set-attributes .set-attribute input[type="number"] {
-      text-align: center;
-      padding: 0px;
-      display: inline-block;
-      -moz-appearance: textfield;
-      border-bottom: 1px solid #ccc; }
-      .workout-card .set-list .set-attributes .set-attribute input[type="number"]::-webkit-outer-spin-button, .workout-card .set-list .set-attributes .set-attribute input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0; }
-
-.calendarRow-anim.ng-enter {
-  -webkit-animation: fadeInDown 1s;
-  animation: fadeInDown 1s; }
-
-.calendarRow-anim.ng-enter-stagger {
+.workout-card.ng-enter {
+  -webkit-animation: fadeInLeft 1s;
+  animation: fadeInLeft 1s; }
+.workout-card.ng-enter-stagger {
   -webkit-animation-delay: 200ms;
   animation-delay: 200ms;
   /* override to make sure it's not inherited from other styles */
   -webkit-animation-duration: 0;
   animation-duration: 0; }
 
-.workout-card.ng-enter {
+.set-list h2 {
+  padding-top: 16px;
+  padding-bottom: 16px; }
+  .set-list h2 button {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    padding: 0px;
+    min-height: 0px;
+    min-width: 0px; }
+.set-list .item {
+  padding-top: 0px;
+  padding-bottom: 0px; }
+.set-list .set-attributes {
+  display: inline-block; }
+  .set-list .set-attributes .input-label {
+    display: inline-block; }
+  .set-list .set-attributes .set-attribute {
+    display: flex; }
+    .set-list .set-attributes .set-attribute input[type="number"] {
+      text-align: center;
+      padding: 0px;
+      display: inline-block;
+      -moz-appearance: textfield;
+      border-bottom: 1px solid #eee; }
+      .set-list .set-attributes .set-attribute input[type="number"]::-webkit-outer-spin-button, .set-list .set-attributes .set-attribute input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0; }
+
+.set-card.ng-enter {
   -webkit-animation: fadeInLeft 1s;
   animation: fadeInLeft 1s; }
 
-.workout-card.ng-enter-stagger {
+.set-card.ng-enter-stagger {
   -webkit-animation-delay: 200ms;
   animation-delay: 200ms;
+  /* override to make sure it's not inherited from other styles */
+  -webkit-animation-duration: 0;
+  animation-duration: 0; }
+
+.calendarRow-anim.ng-enter {
+  -webkit-animation: fadeInDown 500ms;
+  animation: fadeInDown 500ms; }
+
+.calendarRow-anim.ng-enter-stagger {
+  -webkit-animation-delay: 100ms;
+  animation-delay: 100ms;
   /* override to make sure it's not inherited from other styles */
   -webkit-animation-duration: 0;
   animation-duration: 0; }
@@ -98,3 +109,36 @@
   text-align: center;
   margin-left: auto;
   margin-right: auto; }
+
+.calm-form-bg {
+  background: #11c1f3; }
+  .calm-form-bg label.item span {
+    color: #fff; }
+  .calm-form-bg input {
+    color: #fff; }
+
+.dark-form-bg {
+  background: #444; }
+  .dark-form-bg label.item {
+    border-color: #111; }
+    .dark-form-bg label.item span {
+      color: #fff; }
+  .dark-form-bg input {
+    color: #fff; }
+
+.title.title-left {
+  left: 0px; }
+
+.mini-bar {
+  height: 30px; }
+  .mini-bar .title {
+    font-size: 15px;
+    line-height: 30px;
+    height: 30px; }
+  .mini-bar .button {
+    min-height: inherit;
+    min-width: inherit;
+    height: 30px; }
+    .mini-bar .button .icon:before {
+      font-size: 21px !important;
+      color: #444; }

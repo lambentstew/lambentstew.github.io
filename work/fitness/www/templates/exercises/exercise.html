@@ -7,16 +7,13 @@
     </ion-nav-buttons>
   </ion-nav-bar>
   <ion-content>
-    <div id="program form" ng-hide="clickedCalendar">
+    <div id="program form" class="dark-form-bg" ng-hide="clickedCalendar">
       <label class="item item-input">
-        <span class="input-label">Name</span>
+        <span class="input-label"><i class="icon ion-edit"></i> Name</span>
         <input type="text" ng-model="exercise.name">
       </label>
     </div>
     <div class="list">
-      <div class="item">
-        <h2>Exercise Attributes</h2>
-      </div>
       <div class="item item-toggle" ng-repeat="a in attributeList">
         <label class="toggle toggle-assertive">
           <input type="checkbox" ng-model="a[2]" ng-change="onChangeAttribute()">

@@ -3,18 +3,17 @@
     <ion-nav-back-button ng-click="programGoBack()">
     </ion-nav-back-button>
     <ion-nav-buttons side="right">
-      <button ng-show="clickedCalendar" ng-click="addWorkout()" class="button button-clear" style="white-space:normal;width:inherit;max-width:inherit;"><i class="ion-android-add"></i> Workout</button>
       <button ng-hide="isNew" ng-click="delete()" class="button button-clear animZoomIn"><i class="icon ion-trash-a"></i></button>
     </ion-nav-buttons>
   </ion-nav-bar>
   <ion-content>
-    <div id="program form" ng-hide="clickedCalendar">
+    <div id="program form" class="dark-form-bg" ng-hide="clickedCalendar">
       <label class="item item-input">
-        <span class="input-label">Name</span>
+        <span class="input-label"><i class="icon ion-edit"></i> Name</span>
         <input type="text" ng-model="program.name">
       </label>
       <label class="item item-input">
-        <span class="input-label">Tags</span>
+        <span class="input-label"><i class="icon ion-edit"></i> Tags</span>
         <input type="text" ng-model="program.tags">
       </label>
     </div>
@@ -35,11 +34,18 @@
         </div>
         <div class="col" style="padding-top:0px; padding-bottom:10px;" ng-repeat="d in w.days track by $index">
           <button class="button button-small button-fab button-stable" ng-class="{'button-dark': (week==weekIndex && day==$index)}" ng-click="clickCalendar(weekIndex, $index)">
-            <!-- i class="icon ion-plus"></i -->
-            <div ng-show="d > 0" style="height:5px;width:5px;background:#2196F3;border-radius:50%;position:relative;z-index:10000;display:inline-block;"></div>
-            <div ng-show="d > 1" style="height:5px;width:5px;background:#2196F3;border-radius:50%;position:relative;z-index:10000;display:inline-block;"></div>
-            <div ng-show="d > 2" style="height:5px;width:5px;background:#2196F3;border-radius:50%;position:relative;z-index:10000;display:inline-block;"></div>
+            <div ng-show="d > 0" style="height:5px;width:5px;background:#2196F3;border-radius:50%;position:relative;z-index:10000;display:inline-block;top:-2.5px;"></div>
+            <div ng-show="d > 1" style="height:5px;width:5px;background:#2196F3;border-radius:50%;position:relative;z-index:10000;display:inline-block;top:-2.5px;"></div>
+            <div ng-show="d > 2" style="height:5px;width:5px;background:#2196F3;border-radius:50%;position:relative;z-index:10000;display:inline-block;top:-2.5px;"></div>
           </button>
+        </div>
+      </div>
+      <div class="row" ng-hide="clickedCalendar" style="height:36px;">
+        <div style="position:absolute;left:0;">
+          <button ng-click="addWeek()" class="button button-small button-clear"><i class="icon ion-android-add"></i> Add Week</button>
+        </div>
+        <div style="position:absolute;right:0;">
+          <button ng-click="removeWeek()" class="button button-small button-clear"><i class="icon ion-android-remove"></i> Remove Week</button>
         </div>
       </div>
     </div>
@@ -47,72 +53,33 @@
       <button ng-click="save()" class="button button-small button-positive"><i class="icon ion-android-done"></i> Save</button>
     </div>
     <div ng-show="clickedCalendar">
-      <div class="card workout-card animZoomIn" ng-repeat="w in workouts">
-        <div class="bar bar-subheader bar-calm static text-center" style="border:0;">
+      <div class="card workout-card" ng-repeat="w in workouts">
+        <div class="bar bar-calm static text-center" style="border:0;">
           <div class="title title-left">{{w.name}}</div>
           <div class="buttons buttons-right header-item">
             <span class="right-buttons">
-              <button ng-click="openNewSetModal(w)" class="button button-clear" style="white-space:normal;width:inherit;max-width:inherit;"><i class="ion-android-add"></i> Set</button>
-              <button ng-click="deleteWorkout()" class="button button-clear"><i class="icon ion-trash-a"></i></button>
+              <button ng-click="doWorkout(false, 'Editing '+w.name, w._id)" class="button button-clear"><i class="icon ion-edit"></i></button>
             </span>
           </div>
         </div>
         <div class="list set-list">
           <div class="item" ng-repeat="s in w.sets track by $index">
-            <h2 ng-class="{'border-top': $index!=0}">{{ s.name }}<button ng-hide="isNew" ng-click="deleteSet(w, $index)" class="button button-clear"><i class="icon ion-trash-a"></i></button></h2>
-            <div class="set-attributes">
-              <div class="item item-input" ng-repeat="a in s.attributes">
-                <span class="input-label">{{ a[0] }}</span>
-                <div class="set-attribute">
-                  <input type="number" ng-model="a[1]" ng-blur="saveWorkout(w)" size="4" />
-                </div>
-                <div style="margin-left:3px;margin-right:25px;">
-                  <button class="button button-small button-clear button-stable number-button" ng-click="a[1]=a[1]+1;saveWorkout(w)"><i class="icon ion-chevron-up"></i></button>
-                  <button class="button button-small button-clear button-stable number-button" ng-click="a[1]>0?a[1]=a[1]-1:0;saveWorkout(w)"><i class="icon ion-chevron-down"></i></button>
-                </div>
-                <div class="set-attribute">
-                  <input type="number" ng-model="a[2]" ng-blur="saveWorkout(w)" size="4" />
-                </div>
-                <div style="margin-left:3px;margin-right:25px;">
-                  <button class="button button-small button-clear button-stable number-button" ng-click="a[2]=a[2]+1;saveWorkout(w)"><i class="icon ion-chevron-up"></i></button>
-                  <button class="button button-small button-clear button-stable number-button" ng-click="a[2]>0?a[2]=a[2]-1:0;saveWorkout(w)"><i class="icon ion-chevron-down"></i></button>
-                </div>
-              </div>
-            </div>
+            <h2 ng-class="{'border-top': $index!=0}">
+              <span>{{ s.name }}</span>
+              <span style="float:right;">
+                <span ng-repeat="a in s.attributes track by $index">
+                  <span>{{ a[1] }}</span>
+                  <span>{{ a[0] }}</span>
+                  <span ng-show="$index != s.attributes.length-1"> x </span>
+                </span>
+              </span>
+            </h2>
           </div>
         </div>
       </div>
     </div>
+    <div ng-show="clickedCalendar" class="padding">
+      <button class="button button-small button-balanced" ng-click="doWorkout(true, 'Add Workout', '')"><i class="icon ion-android-add"></i> Add Workout</button>
+    </div>
   </ion-content>
-  
-  <script id="new-set-modal.html" type="text/ng-template">
-    <ion-modal-view>
-      <ion-header-bar class="bar-dark">
-        <h1 class="title">Add Set</h1>
-        <div class="buttons buttons-right header-item">
-          <span class="right-buttons">
-            <button ng-click="closeNewSetModal()" class="button button-clear"><i class="icon ion-android-close"></i></button>
-          </span>
-        </div>
-      </ion-header-bar>
-      <ion-content padding="true">
-        <label class="item item-input" style="border-bottom:1px solid #ddd;">
-          <input type="text" placeholder="Search Exercises" ng-model="newset.name" ng-change="onSearchExercise()" />
-        </label>
-        <div class="list card stable-bg" ng-show="newset.name.length > 2 && searchResults.length == 0">
-          <div class="item item-body">
-            No results found, check your spelling or
-            <div class="padding">
-              <button ui-sref="exercises.exercise({isNew: true, action: 'Add Exercise', exercise: {name: '', attributes: []}})" class="button button-small button-balanced"><i class="icon ion-android-add"></i> Add a New Exercise</button>
-            </div>
-          </div>
-        </div>
-        <div class="list list-inset" ng-show="searchResults.length > 0">
-          <div class="item" ng-click="addSet(r)" ng-repeat="r in searchResults">
-            {{ r.name }}
-          </div>
-        </div>
-      </ion-content>
-    </ion-modal-view>
-  </script>
 </ion-view>

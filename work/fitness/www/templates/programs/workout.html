@@ -1,0 +1,80 @@
+<ion-view title="{{action}}">
+  <ion-nav-bar class="bar-calm">
+    <ion-nav-back-button>
+    </ion-nav-back-button>
+    <ion-nav-buttons side="right">
+      <button ng-hide="isNew" ng-click="deleteWorkout(workout)" class="button button-clear animZoomIn"><i class="icon ion-trash-a"></i></button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content>
+    <div id="workout form" class="calm-form-bg">
+      <label class="item item-input">
+        <span class="input-label"><i class="icon ion-edit"></i> Name</span>
+        <input type="text" ng-blur="saveWorkout(workout)" ng-model="workout.name">
+      </label>
+    </div>
+      <div class="card set-card list set-list" ng-repeat="s in workout.sets track by $index">
+        <div class="bar bar-stable mini-bar static text-center" style="border:0;">
+          <div class="title title-left">{{ s.name }}</div>
+          <div class="buttons buttons-right header-item">
+            <span class="right-buttons">
+              <button ng-hide="isNew" ng-click="deleteSet(workout, $index)" class="button button-clear"><i class="icon ion-trash-a"></i></button>
+            </span>
+          </div>
+        </div>
+        <div class="set-attributes">
+          <div class="item item-input" ng-repeat="a in s.attributes">
+            <span class="input-label">{{ a[0] }}</span>
+            <div class="set-attribute">
+              <input type="number" ng-model="a[1]" ng-blur="saveWorkout(workout)" size="4" />
+            </div>
+            <div style="margin-left:3px;margin-right:25px;">
+              <button class="button button-small button-clear button-stable number-button" ng-click="a[1]=a[1]+1;saveWorkout(workout)"><i class="icon ion-chevron-up"></i></button>
+              <button class="button button-small button-clear button-stable number-button" ng-click="a[1]>0?a[1]=a[1]-1:0;saveWorkout(workout)"><i class="icon ion-chevron-down"></i></button>
+            </div>
+            <div class="set-attribute">
+              <input type="number" ng-model="a[2]" ng-blur="saveWorkout(workout)" size="4" />
+            </div>
+            <div style="margin-left:3px;margin-right:25px;">
+              <button class="button button-small button-clear button-stable number-button" ng-click="a[2]=a[2]+1;saveWorkout(workout)"><i class="icon ion-chevron-up"></i></button>
+              <button class="button button-small button-clear button-stable number-button" ng-click="a[2]>0?a[2]=a[2]-1:0;saveWorkout(workout)"><i class="icon ion-chevron-down"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <div ng-show="clickedCalendar" class="padding">
+      <button class="button button-small button-balanced" ng-click="openNewSetModal(workout)"><i class="icon ion-android-add"></i> Add Set</button>
+    </div>
+  </ion-content>
+  
+  <script id="new-set-modal.html" type="text/ng-template">
+    <ion-modal-view>
+      <ion-header-bar class="bar-dark">
+        <h1 class="title">Add Set</h1>
+        <div class="buttons buttons-right header-item">
+          <span class="right-buttons">
+            <button ng-click="closeNewSetModal()" class="button button-clear"><i class="icon ion-android-close"></i></button>
+          </span>
+        </div>
+      </ion-header-bar>
+      <ion-content padding="true">
+        <label class="item item-input" style="border-bottom:1px solid #ddd;">
+          <input type="text" placeholder="Search Exercises" ng-model="newset.name" ng-change="onSearchExercise()" />
+        </label>
+        <div class="list card stable-bg" ng-show="newset.name.length > 2 && searchResults.length == 0">
+          <div class="item item-body">
+            No results found, check your spelling or
+            <div class="padding">
+              <button ui-sref="exercises.exercise({isNew: true, action: 'Add Exercise', exercise: {name: '', attributes: []}})" class="button button-small button-balanced"><i class="icon ion-android-add"></i> Add a New Exercise</button>
+            </div>
+          </div>
+        </div>
+        <div class="list list-inset" ng-show="searchResults.length > 0">
+          <div class="item" ng-click="addSet(r)" ng-repeat="r in searchResults">
+            {{ r.name }}
+          </div>
+        </div>
+      </ion-content>
+    </ion-modal-view>
+  </script>
+</ion-view>

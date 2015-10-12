@@ -377,23 +377,6 @@ function($scope, $stateParams, $ionicPlatform, $ionicHistory, ExercisesService) 
   }
 }]);
 
-angular.module('starter.home', ['ionic'])
-
-.config(['$stateProvider', function($stateProvider) {
-  $stateProvider
-    .state('home', {
-      url: '/home',
-      views: {
-        home: {
-          templateUrl: 'templates/home/home.html',
-          controller: 'Home'
-        }
-      }
-    });
-}])
-
-.controller('Home', [function() {
-}]);
 angular.module('starter.programs-service', [])
         
 .factory('ProgramsService', ['$q', function($q) {
@@ -523,6 +506,20 @@ angular.module('starter.programs', ['ionic'])
         clickedCalendar: false,
         calendarClickCounter: 0
       }
+    })
+    .state('programs.workout', {
+      cache: false,
+      url: '/workout',
+      templateUrl: 'templates/programs/workout.html',
+      controller: 'Workout',
+      params: {
+        isNew: true,
+        action: 'Add Workout',
+        workout_id: '',
+        program_id: '',
+        week: -1,
+        day: -1
+      }
     });
 }])
 
@@ -539,8 +536,8 @@ function($scope, $ionicPlatform, ProgramsService) {
 	});  
 }])
 
-.controller('Program', ['$scope', '$state', '$stateParams', '$ionicPopup', '$ionicModal', '$ionicPlatform', '$ionicHistory', 'ProgramsService', 'ExercisesService', 'WorkoutsService',
-function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform, $ionicHistory, ProgramsService, ExercisesService, WorkoutsService) {
+.controller('Program', ['$scope', '$state', '$stateParams', '$ionicPopup', '$ionicPlatform', '$ionicHistory', 'ProgramsService','WorkoutsService',
+function($scope, $state, $stateParams, $ionicPopup, $ionicPlatform, $ionicHistory, ProgramsService, WorkoutsService) {
   // Load the state params into current scope
   $scope.isNew = $scope.isNew || $stateParams.isNew;
   $scope.action = $scope.action || $stateParams.action;
@@ -567,7 +564,7 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     // Initialize the database.
     $ionicPlatform.ready(function() {
       ProgramsService.initDB();
-      ExercisesService.initDB();
+      WorkoutsService.initDB();
       if($scope.isNew) {
         $scope.program = {calendarSummary: [{display: true, days:[0,0,0,0,0,0,0]},{display: true, days:[0,0,0,0,0,0,0]},{display: true, days:[0,0,0,0,0,0,0]}]};
       } else {
@@ -579,18 +576,9 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
                 $scope.program.calendarSummary[i].display = false;
               }
             }
-            WorkoutsService.initDB();
             // Get all program records from the database.
             WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_').then(function(workouts) {
               $scope.workouts = workouts;
-              if($scope.workouts.length == 0) {
-                $scope.workouts = [
-                  {
-                    name: 'Workout 1',
-                    sets: []
-                  }
-                ];
-              }
             });
           }
           if($scope.week > -1) {
@@ -609,24 +597,6 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
         });
       }
     });
-  });
-  
-  $ionicModal.fromTemplateUrl('new-set-modal.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.newSetModal = modal;
-  });
-  $scope.openNewSetModal = function(w) {
-    $scope.setWorkout = w;
-    $scope.newSetModal.show();
-  };
-  $scope.closeNewSetModal = function() {
-    $scope.newSetModal.hide();
-  };
-  //Cleanup the modal when we're done with it!
-  $scope.$on('$destroy', function() {
-    $scope.newSetModal.remove();
   });
   
   $scope.save = function() {
@@ -674,10 +644,6 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     });
 	};
   
-  // Calendar view.
-  $scope.range = function(num) {
-    return new Array(num);   
-  };
   $scope.clickCalendar = function(w, d) {
     if($scope.program.name != null && $scope.program.name != "") {
       $state.transitionTo('programs.program', {isNew: false, action: 'Editing '+$scope.program.name, program_id: $scope.program._id, week: w, day: d, clickedCalendar: true, calendarClickCounter: $scope.calendarClickCounter+1});
@@ -687,6 +653,106 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
         template: 'Can\'t have an unnamed program.'
       });
     }
+	};
+  
+  $scope.addWeek = function() {
+    $scope.program.calendarSummary.push({display: true, days:[0,0,0,0,0,0,0]});
+    $scope.save();
+  };
+  
+  $scope.removeWeek = function() {
+    $ionicPopup.confirm({
+      title: 'Remove Week',
+      template: 'Remove the week and all workouts under it? This cannot be reversed.'
+    }).then(function(res) {
+      $scope.program.calendarSummary.pop();
+      $scope.save();
+      WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.program.calendarSummary.length).then(function(workouts) {
+        for(var i=0; i<workouts.length; i++) {
+          WorkoutsService.destroy(workouts[i]);
+        }
+      });
+    });
+  };
+  
+  $scope.doWorkout = function(isNew, action, workout_id) {
+    $state.transitionTo('programs.workout', {isNew: isNew, action: action, workout_id: workout_id, program_id: $scope.program._id, week: $scope.week, day: $scope.day});
+  };
+  
+  //extracted from $ionicHistory
+  function getCurrentStateId() {
+    var id;
+    if ($state && $state.current && $state.current.name) {
+      id = $state.current.name;
+      if ($state.params) {
+        for (var key in $state.params) {
+          if ($state.params.hasOwnProperty(key) && $state.params[key]) {
+            id += "_" + key + "=" + $state.params[key];
+          }
+        }
+      }
+      return id;
+    }
+    // if something goes wrong make sure its got a unique stateId
+    return ionic.Utils.nextUid();
+  };
+}])
+
+.controller('Workout', ['$scope', '$state', '$stateParams', '$ionicPopup', '$ionicModal', '$ionicPlatform', '$ionicHistory', 'ProgramsService', 'ExercisesService', 'WorkoutsService',
+function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform, $ionicHistory, ProgramsService, ExercisesService, WorkoutsService) {
+  // Load the state params into current scope
+  $scope.isNew = $scope.isNew || $stateParams.isNew;
+  $scope.action = $scope.action || $stateParams.action;
+  $scope.workout_id = $scope.workout_id || $stateParams.workout_id;
+  $scope.program_id = $scope.program_id || $stateParams.program_id;
+  
+  $scope.week = $scope.week || $stateParams.week;
+  $scope.day = $scope.day || $stateParams.day;
+  
+  $scope.$on('$ionicView.afterEnter', function() {
+    // Initialize the database.
+    $ionicPlatform.ready(function() {
+      ProgramsService.initDB();
+      ExercisesService.initDB();
+      ProgramsService.show($scope.program_id).then(function(doc) {
+        $scope.program = doc;
+        WorkoutsService.initDB();
+        if($scope.workout_id == '' ) {
+          $scope.workout = {name: 'Workout 1', sets: []};
+        } else {
+          WorkoutsService.show($scope.workout_id).then(function(workout) {
+            $scope.workout = workout;
+          });
+        }
+
+        $scope.newset = { name: '' };
+        $scope.searchResults = [];
+      });
+    });
+  });
+  
+  $ionicModal.fromTemplateUrl('new-set-modal.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.newSetModal = modal;
+  });
+  $scope.openNewSetModal = function(w) {
+    $scope.newSetModal.show();
+  };
+  $scope.closeNewSetModal = function() {
+    $scope.newSetModal.hide();
+  };
+  //Cleanup the modal when we're done with it!
+  $scope.$on('$destroy', function() {
+    $scope.newSetModal.remove();
+  });
+  
+  $scope.save = function() {
+    ProgramsService.update($scope.program);	
+    ProgramsService.show($scope.program._id).then(function(doc) {
+      $scope.program = doc;
+    });
 	};
   
   $scope.onSearchExercise = function() {
@@ -700,8 +766,8 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
   };
   
   $scope.addSet = function(r) {
-    $scope.setWorkout.sets.push(r);
-    $scope.saveWorkout($scope.setWorkout);
+    $scope.workout.sets.push(r);
+    $scope.saveWorkout($scope.workout);
     $scope.newset = { name: '' };
     $scope.searchResults = [];
     $scope.closeNewSetModal();
@@ -712,19 +778,16 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     if(w.sets.length == 0) {
       WorkoutsService.destroy(w);
       WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_').then(function(workouts) {
-        $scope.workouts = workouts;
-        $scope.program.calendarSummary[$scope.week].days[$scope.day] = $scope.workouts.length;
+        $scope.program.calendarSummary[$scope.week].days[$scope.day] = workouts.length;
         $scope.save();
+        if(workouts.length == 0) {
+          $scope.workout = {name: 'Workout 1', sets: []};
+        }
       });
-      $scope.save();
     } else {
       $scope.saveWorkout(w);
     }
   };
-  
-  $scope.addWorkout = function() {
-    $scope.workouts.push({name: 'Workout '+($scope.workouts.length+1), sets: []});
-  }
   
   $scope.saveWorkout = function(w) {
     if (!w._id) {
@@ -734,10 +797,21 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
 		} else {
 			WorkoutsService.update(w);
 		}
+    WorkoutsService.show(w._id).then(function(workout) {
+      $scope.workout = workout;
+    });
     WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_').then(function(workouts) {
-      $scope.workouts = workouts;
-      $scope.program.calendarSummary[$scope.week].days[$scope.day] = $scope.workouts.length;
+      $scope.program.calendarSummary[$scope.week].days[$scope.day] = workouts.length;
       $scope.save();
+    });
+  }
+  
+  $scope.deleteWorkout = function(w) {
+    WorkoutsService.destroy(w);
+    WorkoutsService.index('workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_').then(function(workouts) {
+      $scope.program.calendarSummary[$scope.week].days[$scope.day] = workouts.length;
+      $scope.save();
+      $ionicHistory.goBack();
     });
   }
   
@@ -758,31 +832,6 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     // if something goes wrong make sure its got a unique stateId
     return ionic.Utils.nextUid();
   };
-}]);
-angular.module('starter.splash', ['ionic'])
-
-.config(['$stateProvider', function($stateProvider) {
-  $stateProvider
-    .state('splash', {
-      url: '/splash',
-      views: {
-        home: {
-          templateUrl: 'templates/splash/splash.html',
-          controller: 'Splash'
-        }
-      }
-    });
-}])
-
-.controller('Splash', ['$scope', '$state', '$timeout', '$ionicPlatform', 'ExercisesService',
-function($scope, $state, $timeout, $ionicPlatform, ExercisesService) {
-  // Initialize the database.
-	$ionicPlatform.ready(function() {
-		ExercisesService.loadInitialExercises();
-    $timeout(function() {
-      $state.transitionTo('home');
-    }, 2500);
-	});  
 }]);
 angular.module('starter.workouts-service', [])
         
@@ -843,4 +892,54 @@ angular.module('starter.workouts-service', [])
       return _objs;
    });
   };
+}]);
+angular.module('starter.home', ['ionic'])
+
+.config(['$stateProvider', function($stateProvider) {
+  $stateProvider
+    .state('home', {
+      url: '/home',
+      views: {
+        home: {
+          templateUrl: 'templates/home/home.html',
+          controller: 'Home'
+        }
+      }
+    });
+}])
+
+.controller('Home', ['$scope', function($scope) {
+  $scope.prefs = {
+    name: 'Carlo Luminaut',
+    quote: 'Haters gon\' hate.',
+    wt: {
+      unit: 'lb',
+      inc: 5
+    }
+  }
+}]);
+angular.module('starter.splash', ['ionic'])
+
+.config(['$stateProvider', function($stateProvider) {
+  $stateProvider
+    .state('splash', {
+      url: '/splash',
+      views: {
+        home: {
+          templateUrl: 'templates/splash/splash.html',
+          controller: 'Splash'
+        }
+      }
+    });
+}])
+
+.controller('Splash', ['$scope', '$state', '$timeout', '$ionicPlatform', 'ExercisesService',
+function($scope, $state, $timeout, $ionicPlatform, ExercisesService) {
+  // Initialize the database.
+	$ionicPlatform.ready(function() {
+		ExercisesService.loadInitialExercises();
+    $timeout(function() {
+      $state.transitionTo('home');
+    }, 2500);
+	});  
 }]);
