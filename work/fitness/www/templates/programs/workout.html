@@ -12,32 +12,60 @@
         <span class="input-label"><i class="icon ion-edit"></i> Name</span>
         <input type="text" ng-blur="saveWorkout(workout)" ng-model="workout.name">
       </label>
+      <label class="item item-input">
+        <span class="input-label"><i class="icon ion-loop"></i> Repeats</span>
+        <input type="text" ng-blur="saveWorkout(workout)" ng-model="workout.repeat">
+      </label>
     </div>
       <div class="card set-card list set-list" ng-repeat="s in workout.sets track by $index">
-        <div class="bar bar-stable mini-bar static text-center" style="border:0;">
-          <div class="title title-left">{{ s.name }}</div>
-          <div class="buttons buttons-right header-item">
-            <span class="right-buttons">
-              <button ng-hide="isNew" ng-click="deleteSet(workout, $index)" class="button button-clear"><i class="icon ion-trash-a"></i></button>
-            </span>
+        <div class="list" ng-class="{half: workout.repeat > 0}" style="padding:0;margin:0;">
+          <div class="bar bar-stable mini-bar static text-center" style="border:0;">
+            <div class="title title-left">{{ s.name }}</div>
+            <div class="buttons buttons-right header-item">
+              <span class="right-buttons">
+                <button ng-hide="isNew" ng-click="deleteSet(workout, $index)" class="button button-clear"><i class="icon ion-trash-a"></i></button>
+              </span>
+            </div>
+          </div>
+          <div class="set-attributes">
+            <div class="item item-input" ng-repeat="a in s.attributes">
+              <span class="input-label">{{ a[0] }}</span>
+              <div class="set-attribute">
+                <input type="number" ng-model="a[1]" ng-blur="saveWorkout(workout)" size="4" />
+              </div>
+              <div style="margin-left:3px;margin-right:3px;">
+                <button class="button button-small button-clear button-stable number-button" ng-click="a[1]=a[1]+1;saveWorkout(workout)"><i class="icon ion-chevron-up"></i></button>
+                <button class="button button-small button-clear button-stable number-button" ng-click="a[1]>0?a[1]=a[1]-1:0;saveWorkout(workout)"><i class="icon ion-chevron-down"></i></button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="set-attributes">
-          <div class="item item-input" ng-repeat="a in s.attributes">
-            <span class="input-label">{{ a[0] }}</span>
-            <div class="set-attribute">
-              <input type="number" ng-model="a[1]" ng-blur="saveWorkout(workout)" size="4" />
-            </div>
-            <div style="margin-left:3px;margin-right:25px;">
-              <button class="button button-small button-clear button-stable number-button" ng-click="a[1]=a[1]+1;saveWorkout(workout)"><i class="icon ion-chevron-up"></i></button>
-              <button class="button button-small button-clear button-stable number-button" ng-click="a[1]>0?a[1]=a[1]-1:0;saveWorkout(workout)"><i class="icon ion-chevron-down"></i></button>
-            </div>
-            <div class="set-attribute">
-              <input type="number" ng-model="a[2]" ng-blur="saveWorkout(workout)" size="4" />
-            </div>
-            <div style="margin-left:3px;margin-right:25px;">
-              <button class="button button-small button-clear button-stable number-button" ng-click="a[2]=a[2]+1;saveWorkout(workout)"><i class="icon ion-chevron-up"></i></button>
-              <button class="button button-small button-clear button-stable number-button" ng-click="a[2]>0?a[2]=a[2]-1:0;saveWorkout(workout)"><i class="icon ion-chevron-down"></i></button>
+        
+        <div class="list half setRepeat" ng-hide="workout.repeat == 0" style="padding:0;margin:0;">
+          <div class="bar bar-stable mini-bar static text-center" style="border:0;background:#f0f0f0;">
+            <div class="title title-left">Next Iteration</div>
+          </div>
+          <div class="set-attributes" style="background:#fafafa;">
+            <div class="item item-input" ng-repeat="a in s.attributes" style="padding:0;">
+              <label class="toggle toggle-light toggle-plus-minus">
+                <input type="checkbox" checked="true">
+                <div class="track">
+                  <div class="handle"></div>
+                </div>
+              </label>
+              <div class="set-attribute">
+                <input type="number" ng-model="a[2]" ng-blur="saveWorkout(workout)" size="4" />
+              </div>
+              <div style="margin-left:3px;margin-right:3px;">
+                <button class="button button-small button-clear button-stable number-button" ng-click="a[2]=a[2]+1;saveWorkout(workout)"><i class="icon ion-chevron-up"></i></button>
+                <button class="button button-small button-clear button-stable number-button" ng-click="a[2]>0?a[2]=a[2]-1:0;saveWorkout(workout)"><i class="icon ion-chevron-down"></i></button>
+              </div>
+              <label class="toggle toggle-light toggle-{{ a[0] }}">
+                <input type="checkbox" checked="true">
+                <div class="track" style="margin-left:0;">
+                  <div class="handle"></div>
+                </div>
+              </label>
             </div>
           </div>
         </div>

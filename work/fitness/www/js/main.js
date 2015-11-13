@@ -309,8 +309,8 @@ function($scope, $ionicPlatform, ExercisesService) {
 	});  
 }])
 
-.controller('Exercise', ['$scope', '$stateParams', '$ionicPlatform', '$ionicHistory', 'ExercisesService',
-function($scope, $stateParams, $ionicPlatform, $ionicHistory, ExercisesService) {
+.controller('Exercise', ['$scope', '$state', '$stateParams', '$ionicPlatform', '$ionicPopup', '$ionicHistory', 'ExercisesService',
+function($scope, $state, $stateParams, $ionicPlatform, $ionicPopup, $ionicHistory, ExercisesService) {
   $scope.isNew = $scope.isNew || $stateParams.isNew;
   $scope.action = $scope.action || $stateParams.action;
   $scope.exercise = $scope.exercise|| $stateParams.exercise;
@@ -353,6 +353,18 @@ function($scope, $stateParams, $ionicPlatform, $ionicHistory, ExercisesService) 
     }
 	};
   
+  $scope.delete = function() {
+    $ionicPopup.confirm({
+      title: 'Delete Exercise',
+      template: 'Are you sure you want delete this exercise? This cannot be reversed.'
+    }).then(function(res) {
+      if(res) {
+        ExercisesService.destroy($scope.exercise);			
+        $state.transitionTo('exercises.index');
+      }
+    });
+	};
+  
   $scope.onChangeAttribute = function() {
     for(var i=0; i<$scope.attributeList.length; i++) {
       var index = arrayObjectIndexOf($scope.exercise.attributes, $scope.attributeList[i][0], 0);
@@ -377,6 +389,31 @@ function($scope, $stateParams, $ionicPlatform, $ionicHistory, ExercisesService) 
   }
 }]);
 
+angular.module('starter.home', ['ionic'])
+
+.config(['$stateProvider', function($stateProvider) {
+  $stateProvider
+    .state('home', {
+      url: '/home',
+      views: {
+        home: {
+          templateUrl: 'templates/home/home.html',
+          controller: 'Home'
+        }
+      }
+    });
+}])
+
+.controller('Home', ['$scope', function($scope) {
+  $scope.prefs = {
+    name: 'Carlo Luminaut',
+    quote: 'Haters gon\' hate.',
+    wt: {
+      unit: 'lb',
+      inc: 5
+    }
+  }
+}]);
 angular.module('starter.programs-service', [])
         
 .factory('ProgramsService', ['$q', function($q) {
@@ -718,7 +755,7 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
         $scope.program = doc;
         WorkoutsService.initDB();
         if($scope.workout_id == '' ) {
-          $scope.workout = {name: 'Workout 1', sets: []};
+          $scope.workout = {name: 'Workout 1', repeat: 0, sets: []};
         } else {
           WorkoutsService.show($scope.workout_id).then(function(workout) {
             $scope.workout = workout;
@@ -833,6 +870,31 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     return ionic.Utils.nextUid();
   };
 }]);
+angular.module('starter.splash', ['ionic'])
+
+.config(['$stateProvider', function($stateProvider) {
+  $stateProvider
+    .state('splash', {
+      url: '/splash',
+      views: {
+        home: {
+          templateUrl: 'templates/splash/splash.html',
+          controller: 'Splash'
+        }
+      }
+    });
+}])
+
+.controller('Splash', ['$scope', '$state', '$timeout', '$ionicPlatform', 'ExercisesService',
+function($scope, $state, $timeout, $ionicPlatform, ExercisesService) {
+  // Initialize the database.
+	$ionicPlatform.ready(function() {
+		ExercisesService.loadInitialExercises();
+    $timeout(function() {
+      $state.transitionTo('home');
+    }, 2500);
+	});  
+}]);
 angular.module('starter.workouts-service', [])
         
 .factory('WorkoutsService', ['$q', function($q) {
@@ -892,54 +954,4 @@ angular.module('starter.workouts-service', [])
       return _objs;
    });
   };
-}]);
-angular.module('starter.home', ['ionic'])
-
-.config(['$stateProvider', function($stateProvider) {
-  $stateProvider
-    .state('home', {
-      url: '/home',
-      views: {
-        home: {
-          templateUrl: 'templates/home/home.html',
-          controller: 'Home'
-        }
-      }
-    });
-}])
-
-.controller('Home', ['$scope', function($scope) {
-  $scope.prefs = {
-    name: 'Carlo Luminaut',
-    quote: 'Haters gon\' hate.',
-    wt: {
-      unit: 'lb',
-      inc: 5
-    }
-  }
-}]);
-angular.module('starter.splash', ['ionic'])
-
-.config(['$stateProvider', function($stateProvider) {
-  $stateProvider
-    .state('splash', {
-      url: '/splash',
-      views: {
-        home: {
-          templateUrl: 'templates/splash/splash.html',
-          controller: 'Splash'
-        }
-      }
-    });
-}])
-
-.controller('Splash', ['$scope', '$state', '$timeout', '$ionicPlatform', 'ExercisesService',
-function($scope, $state, $timeout, $ionicPlatform, ExercisesService) {
-  // Initialize the database.
-	$ionicPlatform.ready(function() {
-		ExercisesService.loadInitialExercises();
-    $timeout(function() {
-      $state.transitionTo('home');
-    }, 2500);
-	});  
 }]);

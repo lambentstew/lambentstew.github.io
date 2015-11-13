@@ -33,5 +33,29 @@
         </div>
       </div>
     </div>
+    
+    <div class="card set-card list set-list">
+      <div class="bar bar-dark mini-bar static text-center" style="border:0;">
+        <div class="title title-left">Toggle</div>
+      </div>
+      <div class="set-attributes">
+        <div class="item item-input">
+          <label class="toggle toggle-light toggle-plus-minus">
+            <input type="checkbox">
+            <div class="track">
+              <div class="handle"></div>
+            </div>
+          </label>
+          <div class="set-attribute">
+            <input type="number" ng-model="prefs.wt.inc" ng-blur="" size="4" />
+          </div>
+          <div style="margin-left:3px;margin-right:25px;">
+            <button class="button button-small button-clear button-stable number-button" ng-click="prefs.wt.inc=prefs.wt.inc+1"><i class="icon ion-chevron-up"></i></button>
+            <button class="button button-small button-clear button-stable number-button" ng-click="prefs.wt.inc>0?prefs.wt.inc=prefs.wt.inc-1:0"><i class="icon ion-chevron-down"></i></button>
+          </div>
+          {{ prefs.wt.unit }}
+        </div>
+      </div>
+    </div>
   </ion-content>
 </ion-view>
