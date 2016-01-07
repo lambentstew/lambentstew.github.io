@@ -72,7 +72,8 @@
   padding-bottom: 0px; }
 
 .set-list .set-attributes {
-  display: inline-block; }
+  display: inline-block;
+  width: 100%; }
   .set-list .set-attributes .input-label {
     display: inline-block; }
   .set-list .set-attributes .set-attribute {
@@ -108,6 +109,10 @@
   /* override to make sure it's not inherited from other styles */
   -webkit-animation-duration: 0;
   animation-duration: 0; }
+
+.animFadeInDown.ng-hide-remove {
+  -webkit-animation: fadeInDown 1s;
+  animation: fadeInDown 1s; }
 
 .animZoomIn.ng-hide-remove {
   -webkit-animation: zoomIn 1s;

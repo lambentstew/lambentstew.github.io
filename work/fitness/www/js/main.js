@@ -133,12 +133,12 @@ angular.module('starter.exercises-service', [])
   var _db;    
   var _objs;
   var exercisesSeed = [
-    {name: "Bench Press", attributes: [["rep",0,0,0], ["wt",0,0,0]]},
-    {name: "Bench Press 1", attributes: [["rep",0,0,0], ["wt",0,0,0]]},
-    {name: "Bench Press 2", attributes: [["rep",0,0,0], ["wt",0,0,0]]},
-    {name: "Curl", attributes: [["rep",0,0,0], ["wt",0,0,0]]},
-    {name: "Shoulder Press", attributes: [["rep",0,0,0], ["wt",0,0,0]]},
-    {name: "Squat", attributes: [["rep",0,0,0], ["wt",0,0,0]]}
+    {name: "Bench Press", attributes: [["rep",0,0,true,true], ["wt",0,0,true,true]]},
+    {name: "Bench Press 1", attributes: [["rep",0,0,true,true], ["wt",0,0,true,true]]},
+    {name: "Bench Press 2", attributes: [["rep",0,0,true,true], ["wt",0,0,true,true]]},
+    {name: "Curl", attributes: [["rep",0,0,true,true], ["wt",0,0,true,true]]},
+    {name: "Shoulder Press", attributes: [["rep",0,0,true,true], ["wt",0,0,true,true]]},
+    {name: "Squat", attributes: [["rep",0,0,true,true], ["wt",0,0,true,true]]}
   ]
 
   return {
@@ -219,9 +219,7 @@ angular.module('starter.exercises-service', [])
         // array of objects back to the calling controller,
         // so let's map the array to contain just the .doc objects.
         _objs = docs.rows.map(function(row) {
-            // Dates are not automatically converted from a string.
-            row.doc.Date = new Date(row.doc.Date);
-            return row.doc;
+          return row.doc;
         });
 
         // Listen for changes on the database.
@@ -466,9 +464,7 @@ angular.module('starter.programs-service', [])
         // array of objects back to the calling controller,
         // so let's map the array to contain just the .doc objects.
         _objs = docs.rows.map(function(row) {
-            // Dates are not automatically converted from a string.
-            row.doc.Date = new Date(row.doc.Date);
-            return row.doc;
+          return row.doc;
         });
 
         // Listen for changes on the database.
@@ -555,7 +551,8 @@ angular.module('starter.programs', ['ionic'])
         workout_id: '',
         program_id: '',
         week: -1,
-        day: -1
+        day: -1,
+        editType: 'none'
       }
     });
 }])
@@ -573,8 +570,8 @@ function($scope, $ionicPlatform, ProgramsService) {
 	});  
 }])
 
-.controller('Program', ['$scope', '$state', '$stateParams', '$ionicPopup', '$ionicPlatform', '$ionicHistory', 'ProgramsService','WorkoutsService',
-function($scope, $state, $stateParams, $ionicPopup, $ionicPlatform, $ionicHistory, ProgramsService, WorkoutsService) {
+.controller('Program', ['$scope', '$state', '$stateParams', '$ionicPopup', '$ionicModal', '$ionicPlatform', '$ionicHistory', 'ProgramsService','WorkoutsService',
+function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform, $ionicHistory, ProgramsService, WorkoutsService) {
   // Load the state params into current scope
   $scope.isNew = $scope.isNew || $stateParams.isNew;
   $scope.action = $scope.action || $stateParams.action;
@@ -712,8 +709,25 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicPlatform, $ionicHistor
     });
   };
   
-  $scope.doWorkout = function(isNew, action, workout_id) {
-    $state.transitionTo('programs.workout', {isNew: isNew, action: action, workout_id: workout_id, program_id: $scope.program._id, week: $scope.week, day: $scope.day});
+  $ionicModal.fromTemplateUrl('edit-type-modal.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.editTypeModal = modal;
+  });
+  $scope.openEditTypeModal = function(w) {
+    $scope.w = w;
+    $scope.editTypeModal.show();
+  };
+  $scope.closeEditTypeModal = function() {
+    $scope.editTypeModal.hide();
+  };
+  $scope.$on('$destroy', function() {
+    $scope.editTypeModal.remove();
+  });
+  
+  $scope.doWorkout = function(isNew, action, workout_id, editType) {
+    $state.transitionTo('programs.workout', {isNew: isNew, action: action, workout_id: workout_id, editType: editType, program_id: $scope.program._id, week: $scope.week, day: $scope.day});
   };
   
   //extracted from $ionicHistory
@@ -742,6 +756,7 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
   $scope.action = $scope.action || $stateParams.action;
   $scope.workout_id = $scope.workout_id || $stateParams.workout_id;
   $scope.program_id = $scope.program_id || $stateParams.program_id;
+  $scope.editType = $scope.editType || $stateParams.editType;
   
   $scope.week = $scope.week || $stateParams.week;
   $scope.day = $scope.day || $stateParams.day;
@@ -755,10 +770,15 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
         $scope.program = doc;
         WorkoutsService.initDB();
         if($scope.workout_id == '' ) {
-          $scope.workout = {name: 'Workout 1', repeat: 0, sets: []};
+          $scope.workout = {name: 'Workout', week: $scope.week, day: $scope.day, repeatEvery: 0, repeatTimes: 0, sets: []};
         } else {
           WorkoutsService.show($scope.workout_id).then(function(workout) {
             $scope.workout = workout;
+            WorkoutsService.findSeries($scope.workout.series).then(function(seriesResult) {
+              console.log("seriesResult 0:");
+              console.log(seriesResult);
+              $scope.seriesResult = seriesResult;
+            });
           });
         }
 
@@ -780,9 +800,52 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
   $scope.closeNewSetModal = function() {
     $scope.newSetModal.hide();
   };
-  //Cleanup the modal when we're done with it!
   $scope.$on('$destroy', function() {
     $scope.newSetModal.remove();
+  });
+  
+  $ionicModal.fromTemplateUrl('repeat-modal.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.repeatModal = modal;
+  });
+  $scope.openRepeatModal = function(w) {
+    $scope.repeatModal.show();
+    $scope.repeatModal.repeats = true;
+    if($scope.workout.repeatEvery > 0) {
+      $scope.repeatModal.repeatEvery = $scope.workout.repeatEvery;
+    } else {
+      $scope.repeatModal.repeatEvery = 1;
+    }
+    if($scope.workout.repeatTimes == 0) {
+      $scope.repeatModal.repeatTimes = 1;
+      $scope.repeatModal.repeatForever = "1";
+    } else {
+      $scope.repeatModal.repeatTimes = $scope.workout.repeatTimes;
+      $scope.repeatModal.repeatForever = "0";
+    }
+  };
+  $scope.closeRepeatModal = function() {
+    $scope.repeatModal.hide();
+  };
+  $scope.saveRepeat = function() {
+    $scope.repeatModal.hide();
+    if($scope.repeatModal.repeats) {
+      $scope.workout.repeatEvery = $scope.repeatModal.repeatEvery;
+      if($scope.repeatModal.repeatForever == "1") {
+        $scope.workout.repeatTimes = 0;
+      } else {
+        $scope.workout.repeatTimes = $scope.repeatModal.repeatTimes;
+      }
+    } else {
+      $scope.workout.repeatEvery = 0;
+      $scope.workout.repeatTimes = 0;
+    }
+    $scope.saveWorkout($scope.workout);
+  };
+  $scope.$on('$destroy', function() {
+    $scope.repeatModal.remove();
   });
   
   $scope.save = function() {
@@ -830,9 +893,15 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
     if (!w._id) {
       var d = new Date();
       w._id = 'workout_'+$scope.program._id+'_week_'+$scope.week+'_day_'+$scope.day+'_workout_'+d.valueOf();
+      w.series = w._id;
+      w.seriesIndex = 0;
 			WorkoutsService.create(w);
 		} else {
-			WorkoutsService.update(w);
+      if($scope.workout.repeatEvery > 0 && $scope.workout.sets.length > 0) {
+        $scope.createWorkoutSeries();
+      } else {
+        WorkoutsService.update(w);
+      }
 		}
     WorkoutsService.show(w._id).then(function(workout) {
       $scope.workout = workout;
@@ -842,6 +911,80 @@ function($scope, $state, $stateParams, $ionicPopup, $ionicModal, $ionicPlatform,
       $scope.save();
     });
   }
+  
+  $scope.createWorkoutSeries = function() {
+    if($scope.workout.repeatEvery > 0) {
+      var repeatTimes = 0;
+      var repWeek = $scope.week;
+      var repDay = $scope.day;
+      var jumpWeek = ~~(($scope.workout.repeatEvery + repDay)/7);
+      var jumpDay = ($scope.workout.repeatEvery + repDay)%7;
+      repWeek += jumpWeek;
+      repDay = jumpDay;
+      var repArray = [];
+      var i = 1;
+        
+      var repeatWorkouts;
+      // if repeats forever
+      if($scope.workout.repeatTimes == 0) { 
+        repeatWorkouts = $scope.program.calendarSummary.length * 7;
+      } else {
+        repeatWorkouts = $scope.workout.repeatTimes - 1;
+      }
+      
+      console.log("$scope.workout:");
+      console.log($scope.workout);
+      var bulkWorkouts = [$scope.workout];
+      
+      while(repWeek < $scope.program.calendarSummary.length && i <= repeatWorkouts) {
+        var d = new Date();
+        var repWorkout = JSON.parse(JSON.stringify($scope.workout));
+        delete repWorkout._rev;
+        repWorkout._id = 'workout_'+$scope.program._id+'_week_'+repWeek+'_day_'+repDay+'_workout_'+d.valueOf();
+        repWorkout.week = repWeek;
+        repWorkout.day = repDay;
+        repWorkout.series = $scope.workout._id;
+        repWorkout.seriesIndex = i;
+        bulkWorkouts.push(repWorkout);
+        repArray.push([repWeek, repDay]);
+        jumpWeek = ~~(($scope.workout.repeatEvery + repDay)/7);
+        jumpDay = ($scope.workout.repeatEvery + repDay)%7;
+        repWeek += jumpWeek;
+        repDay = jumpDay;
+        i++;
+        repeatTimes++;
+      }
+      
+      if($scope.seriesResult && $scope.seriesResult.length > 0) {
+        for(var i=0; i<$scope.seriesResult.length; i++) {
+          $scope.program.calendarSummary[$scope.seriesResult[i].week].days[$scope.seriesResult[i].day] -= 1;
+        }
+        WorkoutsService.bulkCreate(bulkWorkouts).then(function() {
+          WorkoutsService.bulkDestroy($scope.seriesResult).then(function() {
+            WorkoutsService.findSeries($scope.workout.series).then(function(seriesResult) {
+              console.log("seriesResult 1:");
+              console.log($scope.seriesResult);
+              $scope.seriesResult = seriesResult;
+            });
+          });
+        });
+      } else {
+        WorkoutsService.bulkCreate(bulkWorkouts).then(function() {
+          WorkoutsService.findSeries($scope.workout.series).then(function(seriesResult) {
+            console.log("seriesResult 2:");
+            console.log($scope.seriesResult);
+            $scope.seriesResult = seriesResult;
+          });
+        });
+      }
+      
+      for(var i=0; i<repArray.length; i++) {
+        $scope.program.calendarSummary[repArray[i][0]].days[repArray[i][1]] += 1;
+      }
+
+      $scope.save();
+    }
+  };
   
   $scope.deleteWorkout = function(w) {
     WorkoutsService.destroy(w);
@@ -900,23 +1043,56 @@ angular.module('starter.workouts-service', [])
 .factory('WorkoutsService', ['$q', function($q) {
   var _db;    
   var _objs;
+  var workoutSeriesIndex = {
+    _id: '_design/workout_series_index',
+    views: {
+      'workout_series_index': {
+        map: function (doc) {
+          if(doc.series) {
+            emit(doc.series);
+          }
+        }.toString()
+      }
+    }
+  };
 
   return {
     initDB: initDB,
     index: index,
     show: show,
     create: create,
+    bulkCreate: bulkCreate,
     update: update,
-    destroy: destroy
+    destroy: destroy,
+    bulkDestroy: bulkDestroy,
+    findSeries: findSeries
   };
 
   function initDB() {
     _db = new PouchDB('fitness');
     window.PouchDB = PouchDB;
+    
+    _db.get('_design/workout_series_index').catch(function (err) {
+      if (err.status === 404) { // not found!
+        // create the index
+        _db.put(workoutSeriesIndex).then(function () {
+          // kick off an initial build, return immediately
+          return _db.query('workout_series_index', {stale: 'update_after'});
+        });
+      } else { // hm, some other error
+        throw err;
+      }
+    });
   };
 
   function create(obj) {
     return $q.when(_db.put(obj));
+  };
+  
+  function bulkCreate(obj) {
+    console.log("bulkCreate obj:");
+    console.log(obj);
+    return $q.when(_db.bulkDocs(obj));
   };
 
   function update(obj) {
@@ -927,10 +1103,29 @@ angular.module('starter.workouts-service', [])
     return $q.when(_db.remove(obj));
   };
   
+  function bulkDestroy(obj) {
+    console.log("bulkDestroy obj:");
+    console.log(obj);
+    var deleteObj = obj.map(function(doc) {
+      doc._deleted = true;
+      return doc;
+    });
+    return $q.when(_db.bulkDocs(deleteObj));
+  };
+  
   function show(id) {
     return $q.when(_db.get(id))
     .then(function(_doc) {
       return _doc;
+    });
+  }
+  
+  function findSeries(series) {
+    return $q.when(_db.query('workout_series_index', {key: series, include_docs: true}))
+    .then(function(docs) {
+      return docs.rows.map(function(row) {
+        return row.doc;
+      });
     });
   }
 
@@ -946,9 +1141,7 @@ angular.module('starter.workouts-service', [])
       // array of objects back to the calling controller,
       // so let's map the array to contain just the .doc objects.
       _objs = docs.rows.map(function(row) {
-          // Dates are not automatically converted from a string.
-          row.doc.Date = new Date(row.doc.Date);
-          return row.doc;
+        return row.doc;
       });
 
       return _objs;

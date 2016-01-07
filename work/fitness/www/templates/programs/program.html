@@ -17,7 +17,7 @@
         <input type="text" ng-model="program.tags">
       </label>
     </div>
-    <div ng-hide="isNew" class="calendar stable-bg animZoomIn">
+    <div ng-hide="isNew" class="calendar stable-bg animFadeInDown">
       <div class="row">
         <div class="col" style="padding-top:0px; padding-bottom:10px;">&nbsp;</div>
         <div class="col heading">S</div>
@@ -58,7 +58,7 @@
           <div class="title title-left">{{w.name}}</div>
           <div class="buttons buttons-right header-item">
             <span class="right-buttons">
-              <button ng-click="doWorkout(false, 'Editing '+w.name, w._id)" class="button button-clear"><i class="icon ion-edit"></i></button>
+              <button ng-click="openEditTypeModal(w)" class="button button-clear"><i class="icon ion-edit"></i></button>
             </span>
           </div>
         </div>
@@ -79,7 +79,27 @@
       </div>
     </div>
     <div ng-show="clickedCalendar" class="padding">
-      <button class="button button-small button-balanced" ng-click="doWorkout(true, 'Add Workout', '')"><i class="icon ion-android-add"></i> Add Workout</button>
+      <button class="button button-small button-balanced" ng-click="doWorkout(true, 'Add Workout', '', 'none')"><i class="icon ion-android-add"></i> Add Workout</button>
     </div>
   </ion-content>
+  
+  <script id="edit-type-modal.html" type="text/ng-template">
+    <ion-modal-view>
+      <ion-header-bar class="bar-dark">
+        <h1 class="title">Details</h1>
+        <div class="buttons buttons-right header-item">
+          <span class="right-buttons">
+            <button ng-click="closeEditTypeModal()" class="button button-clear"><i class="icon ion-android-close"></i></button>
+          </span>
+        </div>
+      </ion-header-bar>
+      <ion-content padding="true">
+        <div class="padding">
+          <button class="button button-small" ng-click="doWorkout(false, 'Editing '+w.name, w._id, 'justthis');closeEditTypeModal();">Change only this event</button><br><br>
+          <button class="button button-small" ng-click="doWorkout(false, 'Editing '+w.name, w._id, 'series');closeEditTypeModal();">Change all events in series</button><br><br>
+          <button class="button button-small" ng-click="doWorkout(false, 'Editing '+w.name, w._id, 'thisfuture');closeEditTypeModal();">Change this and future events</button>
+        </div>
+      </ion-content>
+    </ion-modal-view>
+  </script>
 </ion-view>
